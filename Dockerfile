@@ -12,8 +12,9 @@ RUN apt-get update && apt-get install -y dos2unix build-essential ninja-build gc
 
 # Install Xinference and llama-cpp-python
 RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python
-RUN pip install xinference[ggml]==0.4.1 
 RUN pip install sentence-transformers
+RUN pip install git+https://github.com/xorbitsai/inference.git@main#egg=xinference[ggml]
+#RUN pip install xinference[ggml]==0.4.1
 
 # Copy pyproject.toml and poetry.lock files into the container
 COPY pyproject.toml poetry.lock /app/

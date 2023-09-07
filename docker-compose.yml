@@ -9,7 +9,7 @@ services:
       - ./app:/app/app
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - LLM=openai
-      - EMBEDDING=openai
+      - LLM=xinference
+      - EMBEDDING=xinference
     devices:
       - /dev/nvidia0:/dev/nvidia0
