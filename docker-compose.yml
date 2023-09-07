@@ -1,8 +1,15 @@
 version: "3.9"
 
 services:
-  app:
+  test:
     build: .
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     ports:
       - "8501:8501"
     volumes:
@@ -11,5 +18,3 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - LLM=xinference
       - EMBEDDING=xinference
-    devices:
-      - /dev/nvidia0:/dev/nvidia0

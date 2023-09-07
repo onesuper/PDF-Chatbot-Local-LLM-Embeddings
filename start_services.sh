@@ -1,5 +1,7 @@
 #!/bin/bash
 
+python3 -c "import torch;print(torch.cuda.is_available())"
+
 # Start Xinference local server
 xinference --port 8001 &
 
@@ -14,10 +16,10 @@ xinference launch --model-name "llama-2-chat" --model-format "ggmlv3" --size-in-
 xinference launch --model-name "gte-base" --model-type "embedding" --endpoint ${XINFERENCE_SERVER_ENDPOINT}
 
 # Capture the model UID from output
-export XINFERENCE_LLM_MODEL_UID=$(python -c "from xinference.client import Client; c = Client('http://0.0.0.0:8001'); data=c.list_models(); print(list(data.keys())[0])")
+export XINFERENCE_LLM_MODEL_UID=$(python3 -c "from xinference.client import Client; c = Client('http://0.0.0.0:8001'); data=c.list_models(); print(list(data.keys())[0])")
 
 # Capture the model UID from output
-export XINFERENCE_EMBEDDING_MODEL_UID=$(python -c "from xinference.client import Client; c = Client('http://0.0.0.0:8001'); data=c.list_models(); print(list(data.keys())[1])")
+export XINFERENCE_EMBEDDING_MODEL_UID=$(python3 -c "from xinference.client import Client; c = Client('http://0.0.0.0:8001'); data=c.list_models(); print(list(data.keys())[1])")
 
 # Pass the Model UID via an environment variable
 echo "XINFERENCE_EMBEDDING_MODEL_UID is: ${XINFERENCE_EMBEDDING_MODEL_UID}"
