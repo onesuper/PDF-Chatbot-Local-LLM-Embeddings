@@ -64,10 +64,11 @@ def main():
                 st.chat_message("user").write(prompt)
 
                 with st.chat_message("assistant"):
-                    st_cb = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
-                    response = chatbot.conversational_chat(prompt, st_cb)
-                    st.session_state.messages.append({"role": "assistant", "content": response})
-                    st.write(response)
+                    with st.spinner("Thinking..."):
+                        st_cb = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
+                        response = chatbot.conversational_chat(prompt, st_cb)
+                        st.session_state.messages.append({"role": "assistant", "content": response})
+                        st.write(response)
 
 
 if __name__ == "__main__":
