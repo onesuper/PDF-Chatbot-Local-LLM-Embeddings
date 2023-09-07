@@ -72,7 +72,6 @@ def init_embedding_from_env(temperature=0.1, max_tokens=1024):
 
   return embedding
 
-
 def get_service_context(callback_handlers):
     callback_manager = CallbackManager(callback_handlers)
     node_parser = SimpleNodeParser.from_defaults(
@@ -89,9 +88,45 @@ def get_service_context(callback_handlers):
     )
 
 def get_storage_context():
-    return  StorageContext.from_defaults()
+    return StorageContext.from_defaults()
+
+def get_langchain_agent_from_index(summary_index, vector_index):
+    list_query_engine = summary_index.as_query_engine(
+        response_mode="tree_summarize",
+        use_async=True,
+    )
+    vector_query_engine = vector_index.as_query_engine(
+        similarity_top_k=3
+    )        
+    tools = [
+        Tool(
+            name="Summary Tool",
+            func=lambda q: str(list_query_engine.query(q)),
+            description="useful for when you want to get summarizations",
+            return_direct=True,
+        ),
+        Tool(
+            name="Lookup Tool",
+            func=lambda q: str(vector_query_engine.query(q)),
+            description="useful for when you want to lookup detailed information",
+            return_direct=True,
+        ),
+    ]
+
+    agent_chain = initialize_agent(
+        tools, 
+        init_llm_from_env(), 
+        agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
+        verbose=True
+    )
+    return agent_chain
 
 
+def get_llama_index_query_engine_from_index(vector_index):
+    vector_query_engine = vector_index.as_query_engine(
+        similarity_top_k=3
+    )
+    return vector_query_engine
 class ChatEngine:
 
     def __init__(self, file_path):
@@ -107,39 +142,10 @@ class ChatEngine:
         storage_context.docstore.add_documents(nodes)
         logging.info(f"Adding {len(nodes)} nodes to storage")
     
-        summary_index = SummaryIndex(nodes, storage_context=storage_context, service_context=service_context)
-        vector_index = VectorStoreIndex(nodes, storage_context=storage_context, service_context=service_context)  
-
-        list_query_engine = summary_index.as_query_engine(
-            response_mode="tree_summarize",
-            use_async=True,
-        )
-        vector_query_engine = vector_index.as_query_engine(
-            similarity_top_k=3
-        )
-        self.query_engine = vector_query_engine
-
-        tools = [
-            Tool(
-                name="Summary Tool",
-                func=lambda q: str(list_query_engine.query(q)),
-                description="useful for when you want to get summarizations",
-                return_direct=True,
-            ),
-            Tool(
-                name="Lookup Tool",
-                func=lambda q: str(vector_query_engine.query(q)),
-                description="useful for when you want to lookup detailed information",
-                return_direct=True,
-            ),
-        ]
-
-        self.agent_chain = initialize_agent(
-            tools, 
-            init_llm_from_env(), 
-            agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
-            verbose=True
-        )
+        self.summary_index = SummaryIndex(nodes, storage_context=storage_context, 
+                                          service_context=service_context)
+        self.vector_index = VectorStoreIndex(nodes, storage_context=storage_context,
+                                             service_context=service_context)  
 
     # def conversational_chat(self, query, callback_handler):
     #     """
@@ -152,4 +158,4 @@ class ChatEngine:
         """
         Start a conversational chat with a agent
         """
-        return self.query_engine.query(query).response
+        return get_llama_index_query_engine_from_index(self.vector_index).query(query).response
