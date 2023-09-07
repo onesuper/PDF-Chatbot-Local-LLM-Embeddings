@@ -122,11 +122,13 @@ def get_langchain_agent_from_index(summary_index, vector_index):
     return agent_chain
 
 
-def get_llama_index_query_engine_from_index(vector_index):
-    vector_query_engine = vector_index.as_query_engine(
+def get_query_engine_from_index(index):
+    return index.as_query_engine(
         similarity_top_k=3
     )
-    return vector_query_engine
+
+def get_chat_engine_from_index(index):
+    return index.as_chat_engine(chat_mode="condense_question", verbose=True)
 class ChatEngine:
 
     def __init__(self, file_path):
@@ -158,4 +160,4 @@ class ChatEngine:
         """
         Start a conversational chat with a agent
         """
-        return get_llama_index_query_engine_from_index(self.vector_index).query(query).response
+        return get_chat_engine_from_index(self.vector_index).chat(query).response
