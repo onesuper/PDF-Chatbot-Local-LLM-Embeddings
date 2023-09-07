@@ -1,0 +1,8 @@
+.env
+data
+test_data
+wandb
+storage
+.streamlit
+__pypackages__/
+__pycache__/
