@@ -3,7 +3,6 @@ version: "3.9"
 services:
   maas:
     build: ./maas
-    command: ["xinference", "--host", "0.0.0.0", "--port", "8001"]
     deploy:
       resources:
         reservations:

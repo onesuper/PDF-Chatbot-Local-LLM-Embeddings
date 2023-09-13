@@ -13,3 +13,5 @@ RUN pip install sentence-transformers
 RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python==0.1.78 --force-reinstall --upgrade --no-cache-dir
 
 EXPOSE 8001
+
+CMD ["xinference", "--host", "0.0.0.0", "--port", "8001"]
