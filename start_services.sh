@@ -1,14 +1,5 @@
 #!/bin/bash
 
-python3 -c "import torch;print(torch.cuda.is_available())"
-
-# Start Xinference local server
-xinference --port 8001 &
-
-sleep 5
-
-export XINFERENCE_SERVER_ENDPOINT="http://0.0.0.0:8001"
-
 # Launch Llama 2 Chat model 
 xinference launch --model-name "llama-2-chat" --model-format "ggmlv3" --size-in-billions 13 --endpoint ${XINFERENCE_SERVER_ENDPOINT}
 

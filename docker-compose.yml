@@ -1,8 +1,9 @@
 version: "3.9"
 
 services:
-  test:
-    build: .
+  maas:
+    build: ./maas
+    command: ["xinference", "--host", "0.0.0.0", "--port", "8001"]
     deploy:
       resources:
         reservations:
@@ -11,10 +12,16 @@ services:
               count: 1
               capabilities: [gpu]
     ports:
+      - "8001:8001"
+    
+  app:
+    build: .
+    ports:
       - "8501:8501"
     volumes:
       - ./app:/app/app
     environment:
+      - XINFERENCE_SERVER_ENDPOINT=http://maas:8001
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - LLM=xinference
       - EMBEDDING=xinference
